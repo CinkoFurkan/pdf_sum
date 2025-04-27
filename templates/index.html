@@ -1,0 +1,256 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>🧠 AI Assistant - PDF | Audio | YouTube</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <style>
+    body {
+      font-family: 'Segoe UI', sans-serif;
+      margin: 0;
+      padding: 20px;
+      background-color: #f0f2f5;
+      display: flex;
+      justify-content: center;
+      align-items: flex-start;
+      min-height: 100vh;
+    }
+    .container {
+      width: 100%;
+      max-width: 700px;
+      background: white;
+      padding: 30px;
+      border-radius: 16px;
+      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+    }
+    h1 {
+      text-align: center;
+      color: #10a37f;
+      margin-bottom: 30px;
+    }
+    section {
+      margin-bottom: 40px;
+    }
+    section h2 {
+      color: #333;
+      font-size: 1.2rem;
+      margin-bottom: 10px;
+      border-left: 4px solid #10a37f;
+      padding-left: 10px;
+    }
+    input[type="file"],
+    input[type="text"],
+    button {
+      width: 100%;
+      margin-top: 10px;
+      padding: 12px;
+      border-radius: 8px;
+      border: 1px solid #ccc;
+      font-size: 16px;
+      outline: none;
+    }
+    button {
+      background-color: #10a37f;
+      color: white;
+      cursor: pointer;
+      transition: background-color 0.3s ease;
+      border: none;
+    }
+    button:hover {
+      background-color: #0d8b6b;
+    }
+    #output {
+      margin-top: 30px;
+      padding: 20px;
+      background-color: #f7f9fa;
+      border-radius: 12px;
+      min-height: 150px;
+      overflow-y: auto;
+      max-height: 400px;
+      display: flex;
+      flex-direction: column;
+      gap: 15px;
+    }
+    .message {
+      padding: 12px 16px;
+      border-radius: 12px;
+      max-width: 80%;
+    }
+    .user {
+      background-color: #dcf8c6;
+      align-self: flex-end;
+    }
+    .assistant {
+      background-color: #ececec;
+      align-self: flex-start;
+    }
+  </style>
+</head>
+
+<body>
+  <div class="container">
+    <h1>🧠 AI Assistant</h1>
+
+    <section>
+      <h2>📄 PDF Section</h2>
+      <input type="file" id="pdfFile" accept=".pdf">
+      <input type="text" id="question" placeholder="Type your question here...">
+      <button onclick="askQuestion()">Ask Question from PDF</button>
+      <button onclick="summarizePDF()">Summarize PDF</button>
+    </section>
+
+    <section>
+      <h2>🎙️ Audio Section</h2>
+      <input type="file" id="audioFile" accept=".mp3, .wav">
+      <button onclick="transcribeAudio()">Transcribe Audio</button>
+      <button onclick="summarizeTranscript()">Summarize Transcript</button>
+    </section>
+
+    <section>
+      <h2>🎥 YouTube Section</h2>
+      <input type="text" id="youtubeURL" placeholder="Paste YouTube URL here...">
+      <button onclick="transcribeYouTube()">Transcribe YouTube Video</button>
+    </section>
+
+    <div id="output"></div>
+  </div>
+
+  <script>
+    let latestTranscript = "";
+
+    function appendMessage(text, sender) {
+      const output = document.getElementById('output');
+      const message = document.createElement('div');
+      message.className = `message ${sender}`;
+      message.innerText = text;
+      output.appendChild(message);
+      output.scrollTop = output.scrollHeight;
+    }
+
+    async function askQuestion() {
+      const fileInput = document.getElementById('pdfFile');
+      const questionInput = document.getElementById('question');
+
+      if (fileInput.files.length === 0 || questionInput.value.trim() === "") {
+        appendMessage("Please select a PDF file and enter a question!", "assistant");
+        return;
+      }
+
+      const formData = new FormData();
+      formData.append('file', fileInput.files[0]);
+      formData.append('query', questionInput.value);
+
+      appendMessage(questionInput.value, "user");
+      appendMessage("Thinking... ⏳", "assistant");
+
+      try {
+        const response = await fetch('/ask', {
+          method: 'POST',
+          body: formData
+        });
+        const data = await response.json();
+        appendMessage(data.answer || "No answer received.", "assistant");
+      } catch (error) {
+        appendMessage("❌ Error: " + error, "assistant");
+      }
+    }
+
+    async function summarizePDF() {
+      const fileInput = document.getElementById('pdfFile');
+
+      if (fileInput.files.length === 0) {
+        appendMessage("Please select a PDF file to summarize!", "assistant");
+        return;
+      }
+
+      const formData = new FormData();
+      formData.append('file', fileInput.files[0]);
+
+      appendMessage("Summarizing PDF... 📝", "assistant");
+
+      try {
+        const response = await fetch('/summarize', {
+          method: 'POST',
+          body: formData
+        });
+        const data = await response.json();
+        appendMessage(data.summary || "No summary received.", "assistant");
+      } catch (error) {
+        appendMessage("❌ Error: " + error, "assistant");
+      }
+    }
+
+    async function transcribeAudio() {
+      const fileInput = document.getElementById('audioFile');
+
+      if (fileInput.files.length === 0) {
+        appendMessage("Please upload an audio file!", "assistant");
+        return;
+      }
+
+      const formData = new FormData();
+      formData.append('file', fileInput.files[0]);
+
+      appendMessage("Transcribing audio... 🎙️", "assistant");
+
+      try {
+        const response = await fetch('/transcribe', {
+          method: 'POST',
+          body: formData
+        });
+        const data = await response.json();
+        latestTranscript = data.transcript;
+        appendMessage("Transcript:\n" + latestTranscript, "assistant");
+      } catch (error) {
+        appendMessage("❌ Error: " + error, "assistant");
+      }
+    }
+
+    async function summarizeTranscript() {
+      if (latestTranscript.trim() === "") {
+        appendMessage("No transcript available to summarize!", "assistant");
+        return;
+      }
+
+      appendMessage("Summarizing transcript... 📝", "assistant");
+
+      try {
+        const response = await fetch('/summarize_transcript', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ transcript: latestTranscript })
+        });
+        const data = await response.json();
+        appendMessage("Summary:\n" + (data.summary || "No summary received."), "assistant");
+      } catch (error) {
+        appendMessage("❌ Error: " + error, "assistant");
+      }
+    }
+
+    async function transcribeYouTube() {
+      const urlInput = document.getElementById('youtubeURL');
+
+      if (urlInput.value.trim() === "") {
+        appendMessage("Please paste a YouTube URL!", "assistant");
+        return;
+      }
+
+      appendMessage(urlInput.value, "user");
+      appendMessage("Downloading and transcribing YouTube video... 🎥", "assistant");
+
+      try {
+        const response = await fetch('/youtube_transcribe', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ url: urlInput.value })
+        });
+        const data = await response.json();
+        latestTranscript = data.transcript;
+        appendMessage("Transcript:\n" + latestTranscript, "assistant");
+      } catch (error) {
+        appendMessage("❌ Error: " + error, "assistant");
+      }
+    }
+  </script>
+</body>
+</html>

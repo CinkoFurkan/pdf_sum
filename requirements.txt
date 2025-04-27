@@ -1,0 +1,33 @@
+Flask==3.1.0
+Flask-Session==0.8.0
+gunicorn==20.2.0  # Production-ready WSGI server for Flask
+
+# Whisper for audio transcription
+openai-whisper==20240930
+
+# YouTube download
+yt-dlp==2025.3.31
+
+# LangChain and embeddings
+langchain==0.2.11
+langchain-community==0.2.10
+langchain-core==0.2.43
+langchain-ibm==0.1.11
+langchain-text-splitters==0.2.4
+HuggingFaceEmbeddings==0.2.4
+
+# OpenAI API
+openai==0.28.0
+
+# PyTorch and Transformers for NLP
+torch==2.7.0
+transformers==4.51.3
+
+# Document handling (PDF, DOCX)
+python-docx==1.1.2
+unstructured==0.17.2
+unstructured-client==0.34.0
+
+# Other utilities
+requests==2.32.2
+gunicorn==23.0.0
