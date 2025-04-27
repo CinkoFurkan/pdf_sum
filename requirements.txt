@@ -29,3 +29,4 @@ unstructured-client==0.34.0
 
 # Other utilities
 requests==2.32.2
+pdfminer.six==20250416
