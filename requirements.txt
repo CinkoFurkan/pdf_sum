@@ -20,3 +20,4 @@ gunicorn==23.0.0
 requests==2.32.2
 python-dotenv==1.1.0
 pdfminer.six==20250416
+pi_heif==0.22.0
