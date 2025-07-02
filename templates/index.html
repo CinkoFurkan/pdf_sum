@@ -5,84 +5,275 @@
   <title>🧠 AI Assistant - PDF | Audio | YouTube</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <style>
+    * {
+      box-sizing: border-box;
+    }
+
     body {
-      font-family: 'Segoe UI', sans-serif;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
       margin: 0;
       padding: 20px;
-      background-color: #f0f2f5;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      min-height: 100vh;
       display: flex;
       justify-content: center;
       align-items: flex-start;
-      min-height: 100vh;
     }
+
     .container {
       width: 100%;
-      max-width: 700px;
-      background: white;
-      padding: 30px;
-      border-radius: 16px;
-      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+      max-width: 800px;
+      background: rgba(255, 255, 255, 0.95);
+      padding: 40px;
+      border-radius: 20px;
+      box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+      backdrop-filter: blur(10px);
     }
+
     h1 {
       text-align: center;
-      color: #10a37f;
-      margin-bottom: 30px;
-    }
-    section {
-      margin-bottom: 40px;
-    }
-    section h2 {
       color: #333;
-      font-size: 1.2rem;
-      margin-bottom: 10px;
-      border-left: 4px solid #10a37f;
-      padding-left: 10px;
+      margin-bottom: 40px;
+      font-size: 2.5rem;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
     }
+
+    .tabs {
+      display: flex;
+      margin-bottom: 30px;
+      border-bottom: 2px solid #e0e0e0;
+    }
+
+    .tab {
+      flex: 1;
+      padding: 15px;
+      text-align: center;
+      cursor: pointer;
+      background: none;
+      border: none;
+      font-size: 16px;
+      color: #666;
+      transition: all 0.3s ease;
+      position: relative;
+    }
+
+    .tab.active {
+      color: #667eea;
+      font-weight: bold;
+    }
+
+    .tab.active::after {
+      content: '';
+      position: absolute;
+      bottom: -2px;
+      left: 0;
+      right: 0;
+      height: 2px;
+      background: #667eea;
+    }
+
+    .tab:hover {
+      color: #667eea;
+    }
+
+    .tab-content {
+      display: none;
+      animation: fadeIn 0.3s ease;
+    }
+
+    .tab-content.active {
+      display: block;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(10px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    .input-group {
+      margin-bottom: 20px;
+    }
+
+    label {
+      display: block;
+      margin-bottom: 8px;
+      color: #555;
+      font-weight: 500;
+    }
+
     input[type="file"],
     input[type="text"],
-    button {
+    input[type="url"],
+    textarea {
       width: 100%;
-      margin-top: 10px;
-      padding: 12px;
-      border-radius: 8px;
-      border: 1px solid #ccc;
+      padding: 12px 16px;
+      border-radius: 10px;
+      border: 2px solid #e0e0e0;
       font-size: 16px;
       outline: none;
+      transition: all 0.3s ease;
+      background: #f8f9fa;
     }
+
+    input[type="file"]:focus,
+    input[type="text"]:focus,
+    input[type="url"]:focus,
+    textarea:focus {
+      border-color: #667eea;
+      background: white;
+    }
+
+    textarea {
+      resize: vertical;
+      min-height: 80px;
+    }
+
     button {
-      background-color: #10a37f;
-      color: white;
-      cursor: pointer;
-      transition: background-color 0.3s ease;
+      width: 100%;
+      padding: 14px;
+      border-radius: 10px;
       border: none;
+      font-size: 16px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: white;
+      position: relative;
+      overflow: hidden;
     }
+
     button:hover {
-      background-color: #0d8b6b;
+      transform: translateY(-2px);
+      box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
     }
+
+    button:active {
+      transform: translateY(0);
+    }
+
+    button:disabled {
+      opacity: 0.6;
+      cursor: not-allowed;
+      transform: none;
+    }
+
+    .button-group {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+      margin-bottom: 20px;
+    }
+
     #output {
       margin-top: 30px;
       padding: 20px;
-      background-color: #f7f9fa;
-      border-radius: 12px;
-      min-height: 150px;
+      background: #f8f9fa;
+      border-radius: 15px;
+      min-height: 200px;
+      max-height: 500px;
       overflow-y: auto;
-      max-height: 400px;
       display: flex;
       flex-direction: column;
       gap: 15px;
+      border: 2px solid #e0e0e0;
     }
+
     .message {
-      padding: 12px 16px;
-      border-radius: 12px;
+      padding: 12px 18px;
+      border-radius: 18px;
       max-width: 80%;
+      word-wrap: break-word;
+      animation: messageSlide 0.3s ease;
     }
+
+    @keyframes messageSlide {
+      from { opacity: 0; transform: translateY(10px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
     .user {
-      background-color: #dcf8c6;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: white;
       align-self: flex-end;
     }
+
     .assistant {
-      background-color: #ececec;
+      background: #e8e8e8;
+      color: #333;
       align-self: flex-start;
+    }
+
+    .loading {
+      display: inline-block;
+      width: 20px;
+      height: 20px;
+      border: 3px solid #f3f3f3;
+      border-top: 3px solid #667eea;
+      border-radius: 50%;
+      animation: spin 1s linear infinite;
+    }
+
+    @keyframes spin {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
+
+    .error {
+      background: #fee;
+      color: #c33;
+      padding: 10px;
+      border-radius: 8px;
+      margin-bottom: 10px;
+    }
+
+    .success {
+      background: #efe;
+      color: #3c3;
+      padding: 10px;
+      border-radius: 8px;
+      margin-bottom: 10px;
+    }
+
+    .file-info {
+      font-size: 14px;
+      color: #666;
+      margin-top: 5px;
+    }
+
+    .clear-button {
+      background: #e0e0e0;
+      color: #666;
+      padding: 8px 16px;
+      border-radius: 8px;
+      border: none;
+      cursor: pointer;
+      font-size: 14px;
+      margin-top: 10px;
+    }
+
+    .clear-button:hover {
+      background: #d0d0d0;
+    }
+
+    @media (max-width: 600px) {
+      .container {
+        padding: 20px;
+      }
+
+      h1 {
+        font-size: 2rem;
+      }
+
+      .button-group {
+        grid-template-columns: 1fr;
+      }
+
+      .tabs {
+        flex-direction: column;
+      }
     }
   </style>
 </head>
@@ -91,32 +282,91 @@
   <div class="container">
     <h1>🧠 AI Assistant</h1>
 
-    <section>
-      <h2>📄 PDF Section</h2>
-      <input type="file" id="pdfFile" accept=".pdf">
-      <input type="text" id="question" placeholder="Type your question here...">
-      <button onclick="askQuestion()">Ask Question from PDF</button>
-      <button onclick="summarizePDF()">Summarize PDF</button>
-    </section>
+    <div class="tabs">
+      <button class="tab active" onclick="showTab('pdf')">📄 PDF</button>
+      <button class="tab" onclick="showTab('audio')">🎙️ Audio</button>
+      <button class="tab" onclick="showTab('youtube')">🎥 YouTube</button>
+      <button class="tab" onclick="showTab('chat')">💬 Chat</button>
+    </div>
 
-    <section>
-      <h2>🎙️ Audio Section</h2>
-      <input type="file" id="audioFile" accept=".mp3, .wav">
-      <button onclick="transcribeAudio()">Transcribe Audio</button>
-      <button onclick="summarizeTranscript()">Summarize Transcript</button>
-    </section>
+    <div id="pdf" class="tab-content active">
+      <div class="input-group">
+        <label for="pdfFile">Upload PDF Document</label>
+        <input type="file" id="pdfFile" accept=".pdf,.docx" onchange="showFileInfo('pdfFile')">
+        <div id="pdfFileInfo" class="file-info"></div>
+      </div>
 
-    <section>
-      <h2>🎥 YouTube Section</h2>
-      <input type="text" id="youtubeURL" placeholder="Paste YouTube URL here...">
+      <div class="input-group">
+        <label for="question">Ask a Question</label>
+        <textarea id="question" placeholder="What would you like to know about this document?"></textarea>
+      </div>
+
+      <div class="button-group">
+        <button onclick="askQuestion()">Ask Question</button>
+        <button onclick="summarizePDF()">Summarize Document</button>
+      </div>
+    </div>
+
+    <div id="audio" class="tab-content">
+      <div class="input-group">
+        <label for="audioFile">Upload Audio File</label>
+        <input type="file" id="audioFile" accept=".mp3,.wav,.m4a" onchange="showFileInfo('audioFile')">
+        <div id="audioFileInfo" class="file-info"></div>
+      </div>
+
+      <div class="button-group">
+        <button onclick="transcribeAudio()">Transcribe Audio</button>
+        <button onclick="summarizeTranscript()">Summarize Transcript</button>
+      </div>
+    </div>
+
+    <div id="youtube" class="tab-content">
+      <div class="input-group">
+        <label for="youtubeURL">YouTube Video URL</label>
+        <input type="url" id="youtubeURL" placeholder="https://www.youtube.com/watch?v=...">
+      </div>
+
       <button onclick="transcribeYouTube()">Transcribe YouTube Video</button>
-    </section>
+    </div>
+
+    <div id="chat" class="tab-content">
+      <div class="input-group">
+        <label for="chatInput">Chat with AI Assistant</label>
+        <textarea id="chatInput" placeholder="Ask me anything..."></textarea>
+      </div>
+
+      <button onclick="sendChat()">Send Message</button>
+    </div>
 
     <div id="output"></div>
+    <button class="clear-button" onclick="clearOutput()">Clear Messages</button>
   </div>
 
   <script>
     let latestTranscript = "";
+    let isProcessing = false;
+
+    function showTab(tabName) {
+      const tabs = document.querySelectorAll('.tab');
+      const contents = document.querySelectorAll('.tab-content');
+
+      tabs.forEach(tab => tab.classList.remove('active'));
+      contents.forEach(content => content.classList.remove('active'));
+
+      document.querySelector(`.tab:nth-child(${Array.from(tabs).findIndex(t => t.textContent.toLowerCase().includes(tabName.toLowerCase())) + 1})`).classList.add('active');
+      document.getElementById(tabName).classList.add('active');
+    }
+
+    function showFileInfo(inputId) {
+      const input = document.getElementById(inputId);
+      const infoDiv = document.getElementById(inputId + 'Info');
+
+      if (input.files.length > 0) {
+        const file = input.files[0];
+        const sizeMB = (file.size / 1024 / 1024).toFixed(2);
+        infoDiv.textContent = `Selected: ${file.name} (${sizeMB} MB)`;
+      }
+    }
 
     function appendMessage(text, sender) {
       const output = document.getElementById('output');
@@ -127,31 +377,66 @@
       output.scrollTop = output.scrollHeight;
     }
 
+    function showLoading(message = "Processing...") {
+      appendMessage(message + " ⏳", "assistant");
+    }
+
+    function clearOutput() {
+      document.getElementById('output').innerHTML = '';
+    }
+
+    function setProcessing(state) {
+      isProcessing = state;
+      const buttons = document.querySelectorAll('button');
+      buttons.forEach(btn => {
+        if (btn.className !== 'clear-button' && btn.className !== 'tab') {
+          btn.disabled = state;
+        }
+      });
+    }
+
+    async function handleResponse(response) {
+      if (!response.ok) {
+        const error = await response.json();
+        throw new Error(error.error || 'Request failed');
+      }
+      return response.json();
+    }
+
     async function askQuestion() {
       const fileInput = document.getElementById('pdfFile');
       const questionInput = document.getElementById('question');
 
-      if (fileInput.files.length === 0 || questionInput.value.trim() === "") {
-        appendMessage("Please select a PDF file and enter a question!", "assistant");
+      if (!questionInput.value.trim()) {
+        appendMessage("Please enter a question!", "assistant");
         return;
       }
 
+      if (fileInput.files.length === 0) {
+        appendMessage("Please upload a PDF or DOCX file first!", "assistant");
+        return;
+      }
+
+      setProcessing(true);
       const formData = new FormData();
       formData.append('file', fileInput.files[0]);
       formData.append('query', questionInput.value);
 
       appendMessage(questionInput.value, "user");
-      appendMessage("Thinking... ⏳", "assistant");
+      showLoading("Analyzing document and finding answer...");
 
       try {
         const response = await fetch('/ask', {
           method: 'POST',
           body: formData
         });
-        const data = await response.json();
+        const data = await handleResponse(response);
         appendMessage(data.answer || "No answer received.", "assistant");
+        questionInput.value = '';
       } catch (error) {
-        appendMessage("❌ Error: " + error, "assistant");
+        appendMessage("❌ Error: " + error.message, "assistant");
+      } finally {
+        setProcessing(false);
       }
     }
 
@@ -159,24 +444,27 @@
       const fileInput = document.getElementById('pdfFile');
 
       if (fileInput.files.length === 0) {
-        appendMessage("Please select a PDF file to summarize!", "assistant");
+        appendMessage("Please select a PDF or DOCX file to summarize!", "assistant");
         return;
       }
 
+      setProcessing(true);
       const formData = new FormData();
       formData.append('file', fileInput.files[0]);
 
-      appendMessage("Summarizing PDF... 📝", "assistant");
+      showLoading("Reading and summarizing document...");
 
       try {
         const response = await fetch('/summarize', {
           method: 'POST',
           body: formData
         });
-        const data = await response.json();
-        appendMessage(data.summary || "No summary received.", "assistant");
+        const data = await handleResponse(response);
+        appendMessage("📝 Summary:\n" + (data.summary || "No summary received."), "assistant");
       } catch (error) {
-        appendMessage("❌ Error: " + error, "assistant");
+        appendMessage("❌ Error: " + error.message, "assistant");
+      } finally {
+        setProcessing(false);
       }
     }
 
@@ -188,31 +476,35 @@
         return;
       }
 
+      setProcessing(true);
       const formData = new FormData();
       formData.append('file', fileInput.files[0]);
 
-      appendMessage("Transcribing audio... 🎙️", "assistant");
+      showLoading("Transcribing audio... This may take a few moments...");
 
       try {
         const response = await fetch('/transcribe', {
           method: 'POST',
           body: formData
         });
-        const data = await response.json();
+        const data = await handleResponse(response);
         latestTranscript = data.transcript;
-        appendMessage("Transcript:\n" + latestTranscript, "assistant");
+        appendMessage("🎙️ Transcript:\n" + latestTranscript, "assistant");
       } catch (error) {
-        appendMessage("❌ Error: " + error, "assistant");
+        appendMessage("❌ Error: " + error.message, "assistant");
+      } finally {
+        setProcessing(false);
       }
     }
 
     async function summarizeTranscript() {
-      if (latestTranscript.trim() === "") {
-        appendMessage("No transcript available to summarize!", "assistant");
+      if (!latestTranscript.trim()) {
+        appendMessage("No transcript available to summarize! Please transcribe an audio file first.", "assistant");
         return;
       }
 
-      appendMessage("Summarizing transcript... 📝", "assistant");
+      setProcessing(true);
+      showLoading("Summarizing transcript...");
 
       try {
         const response = await fetch('/summarize_transcript', {
@@ -220,23 +512,33 @@
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ transcript: latestTranscript })
         });
-        const data = await response.json();
-        appendMessage("Summary:\n" + (data.summary || "No summary received."), "assistant");
+        const data = await handleResponse(response);
+        appendMessage("📝 Summary:\n" + (data.summary || "No summary received."), "assistant");
       } catch (error) {
-        appendMessage("❌ Error: " + error, "assistant");
+        appendMessage("❌ Error: " + error.message, "assistant");
+      } finally {
+        setProcessing(false);
       }
     }
 
     async function transcribeYouTube() {
       const urlInput = document.getElementById('youtubeURL');
 
-      if (urlInput.value.trim() === "") {
+      if (!urlInput.value.trim()) {
         appendMessage("Please paste a YouTube URL!", "assistant");
         return;
       }
 
+      // Basic YouTube URL validation
+      const youtubeRegex = /^(https?:\/\/)?(www\.)?(youtube\.com|youtu\.be)\/.+/;
+      if (!youtubeRegex.test(urlInput.value)) {
+        appendMessage("Please enter a valid YouTube URL!", "assistant");
+        return;
+      }
+
+      setProcessing(true);
       appendMessage(urlInput.value, "user");
-      appendMessage("Downloading and transcribing YouTube video... 🎥", "assistant");
+      showLoading("Downloading and transcribing YouTube video... This may take several minutes...");
 
       try {
         const response = await fetch('/youtube_transcribe', {
@@ -244,13 +546,58 @@
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ url: urlInput.value })
         });
-        const data = await response.json();
+        const data = await handleResponse(response);
         latestTranscript = data.transcript;
-        appendMessage("Transcript:\n" + latestTranscript, "assistant");
+        appendMessage("🎥 Transcript:\n" + latestTranscript, "assistant");
+        urlInput.value = '';
       } catch (error) {
-        appendMessage("❌ Error: " + error, "assistant");
+        appendMessage("❌ Error: " + error.message, "assistant");
+      } finally {
+        setProcessing(false);
       }
     }
+
+    async function sendChat() {
+      const chatInput = document.getElementById('chatInput');
+
+      if (!chatInput.value.trim()) {
+        appendMessage("Please type a message!", "assistant");
+        return;
+      }
+
+      setProcessing(true);
+      const query = chatInput.value;
+      appendMessage(query, "user");
+      showLoading("Thinking...");
+
+      try {
+        const response = await fetch('/ask', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+          body: new URLSearchParams({ query: query })
+        });
+        const data = await handleResponse(response);
+        appendMessage(data.answer || "No response received.", "assistant");
+        chatInput.value = '';
+      } catch (error) {
+        appendMessage("❌ Error: " + error.message, "assistant");
+      } finally {
+        setProcessing(false);
+      }
+    }
+
+    // Allow Enter key to submit in chat
+    document.getElementById('chatInput').addEventListener('keypress', function(e) {
+      if (e.key === 'Enter' && !e.shiftKey) {
+        e.preventDefault();
+        sendChat();
+      }
+    });
+
+    // Show initial welcome message
+    window.onload = function() {
+      appendMessage("👋 Welcome! I can help you with PDFs, audio transcription, and YouTube videos. Choose a tab above to get started!", "assistant");
+    };
   </script>
 </body>
 </html>
